@@ -1,0 +1,6 @@
+peewee==3.14.0
+python-decouple==3.4
+uuid==1.30
+grpcio==1.35.0
+grpcio-tools==1.35.0
+psycopg2==2.8.6

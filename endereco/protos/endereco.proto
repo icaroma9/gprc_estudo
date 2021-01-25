@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package endereco;
+
+service EnderecoService {
+  rpc Create (Endereco) returns (Endereco) {}
+  rpc List (Endereco) returns (stream Endereco) {}
+  rpc Retrieve (Endereco) returns (Endereco) {}
+  rpc Update (Endereco) returns (Endereco) {}
+  rpc Delete (Endereco) returns (DeleteResponse) {}
+}
+
+
+message Endereco {
+  string id = 1;
+  string logradouro = 2;
+  string cep = 3;
+  string bairro = 4;
+  string cidade = 5;
+  string estado = 6;
+}
+
+message DeleteResponse {
+  string status = 1;
+}

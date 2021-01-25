@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package cliente;
+service ClienteService {
+  rpc Create (Cliente) returns (Cliente) {}
+  rpc List (Cliente) returns (stream Cliente) {}
+  rpc Retrieve (Cliente) returns (Cliente) {}
+  rpc Update (Cliente) returns (Cliente) {}
+  rpc Delete (Cliente) returns (DeleteResponse) {}
+}
+
+message Cliente {
+  string id = 1;
+  string nome = 2;
+  string sobrenome = 3;
+  string cpf = 4;
+  string sexo = 5;
+  string telefone = 6;
+  string email = 7;
+  string endereco_id = 8;
+  string logradouro = 9;
+  string cep = 10;
+  string bairro = 11;
+  string cidade = 12;
+  string estado = 13;
+}
+
+message DeleteResponse {
+  string status = 1;
+}

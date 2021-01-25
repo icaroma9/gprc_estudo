@@ -1,0 +1,102 @@
+version: "3.6"
+
+services:
+  nginx:
+    image: nginx:1.19.6
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api
+    networks:
+      - api
+
+  api:
+    build: ./api
+    restart: always
+    command: gunicorn --bind 0.0.0.0:5000 wsgi:app
+    volumes:
+      - ./api:/app
+    stdin_open: true
+    tty: true
+    expose:
+      - 5000
+    networks:
+      - api
+      - grpc
+    depends_on:
+      - grpc_endereco
+      - grpc_cliente
+
+  grpc_endereco:
+    build:
+      context: ./endereco
+    restart: always
+    command: python server.py
+    depends_on:
+      - db_endereco
+    volumes:
+      - ./endereco:/app
+    stdin_open: true
+    tty: true
+    networks:
+      - grpc
+      - db_endereco
+    environment:
+      - GRPC_VERBOSITY=ERROR
+      - GRPC_TRACE=http
+
+  db_endereco:
+    restart: always
+    image: postgres:latest
+    volumes:
+      - postgres_endereco_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_PASSWORD: 123
+      POSTGRES_USER: postgres
+      POSTGRES_DB: endereco
+      PGDATA: /var/lib/postgresql/data/
+    networks:
+      - db_endereco
+
+  grpc_cliente:
+    build:
+      context: ./cliente
+    restart: always
+    command: python server.py
+    depends_on:
+      - db_cliente
+    volumes:
+      - ./cliente:/app
+    stdin_open: true
+    tty: true
+    networks:
+      - grpc
+      - db_cliente
+    environment:
+      - GRPC_VERBOSITY=ERROR
+      - GRPC_TRACE=http
+
+  db_cliente:
+    restart: always
+    image: postgres:latest
+    volumes:
+      - postgres_cliente_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_PASSWORD: 123
+      POSTGRES_USER: postgres
+      POSTGRES_DB: cliente
+      PGDATA: /var/lib/postgresql/data/
+    networks:
+      - db_cliente
+
+volumes:
+  postgres_cliente_data:
+  postgres_endereco_data:
+
+networks:
+  api:
+  grpc:
+  db_endereco:
+  db_cliente:
